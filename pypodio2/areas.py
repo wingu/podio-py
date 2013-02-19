@@ -176,6 +176,16 @@ class Task(Area):
         '''
         return self.transport.POST(url='/task/%s/complete' % task_id)
 
+    def create(self, attrs):
+        '''
+        Mark the given task as completed.
+        Arguments:
+            task_id: Task ID as string or int
+        '''
+        return self.transport.POST(url='/task/',
+                                   body=json.dumps(attrs),
+                                   type='application/json')
+
 
 class User(Area):
 
@@ -184,6 +194,9 @@ class User(Area):
 
     def current(self):
         return self.transport.get(url='/user/')
+
+    def profile(self):
+        return self.transport.get(url='/user/profile/')
 
 class Org(Area):
 
@@ -363,6 +376,59 @@ class Connection(Area):
     def reload(self, conn_id):
         return self.transport.POST(url='/connection/%s/load')
 
+
+class Email(Area):
+    def app_config(self, app_id):
+        return self.transport.GET(url='/email/app/%s' % app_id)
+
+    def gen_task(self, space_id):
+        """
+        Generate an email address to allow a user to create a space task.
+
+        Endpoints:
+            /email/contact/task/space/[space id]
+        """
+        url = '/email/contact/task/space/{space_id}'.format(space_id=space_id)
+        return self.transport.get(url=url)
+
+    def gen_status(self, space_id):
+        """
+        Generate an email address to allow a user to create a status in the
+        given space.
+
+        Endpoints:
+            /email/contact/status/space/[space id]
+        """
+        url = '/email/contact/status/space/{space_id}'.format(space_id=space_id)
+        return self.transport.get(url=url)
+
+    def gen_app_item(self, app_id, created_by_user=True):
+        """
+        Generate an email address to allow a user to create an application item.
+
+        `created_by_user`: If True, the item will appear as being created by
+        the user. Otherwise, item will appear as created by the app.
+
+        Endpoints:
+            /email/contact/item_user/app/[app id]
+            /email/contact/item_app/app/[app id]
+        """
+        item_type='user' if created_by_user else 'app'
+        url = '/email/contact/item_{item_type}/app/{app_id}'.format(
+                                                            item_type=item_type,
+                                                            app_id=app_id)
+        return self.transport.get(url=url)
+
+    def gen_space(self, org_id):
+        """
+        Generate an email address to allow a user to create a space within
+        the organization.
+
+        Endpoints:
+            /email/contact/space/org/[org id]
+        """
+        url = '/email/contact/space/org/{org_id}'.format(org_id=org_id)
+        return self.transport.get(url=url)
 
 class Notification(Area):
 
