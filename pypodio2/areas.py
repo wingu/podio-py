@@ -119,16 +119,22 @@ class Application(Area):
         '''
         return self.transport.DELETE(url='/app/%s' % app_id)
 
-    def find(self, app_id):
+    def find(self, app_id, type=None):
         '''
         Finds application with id app_id.
 
           Arguments:
             app_id: Application ID as string or int
+            type: The type of the view of the app requested. Can be either
+                  "full", "short", "mini" or "micro". Default value: "full"
           Returns:
             Python dict of JSON response
         '''
-        return self.transport.GET(url='/app/%s' % app_id)
+        querystring = ''
+        if type:
+            querystring = '?type=%s' % type
+
+        return self.transport.GET(url='/app/%s%s' % (app_id, querystring))
 
     def get_items(self, app_id, **kwargs):
         return self.transport.GET(url='/item/app/%s/' % app_id, **kwargs)
@@ -208,7 +214,7 @@ class Space(Area):
         super(Space, self).__init__(*args, **kwargs)
 
     def find(self, space_id):
-        return self.transport.GET(url='/space/%s' % id)
+        return self.transport.GET(url='/space/%s' % space_id)
 
     def find_by_url(self, space_url, id_only=True):
         '''
